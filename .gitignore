@@ -1,0 +1,12 @@
+node_modules
+build
+logs
+test-*
+.DS_Store
+.deviceid
+buckets
+config.json
+
+# Generated SBOM artifacts (run `npm run sbom` / `npm run sbom:md`)
+sbom.json
+SBOM.md

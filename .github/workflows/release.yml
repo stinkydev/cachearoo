@@ -1,0 +1,127 @@
+name: Release tagged
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    name: "Build Windows Package"
+    runs-on: "windows-latest"
+
+    strategy:
+      matrix:
+        node-version: [24.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build frontend
+        run: |
+          cd _admin
+          npm install
+          
+      - name: Build
+        run: |
+          npm install
+          npm run build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider --no-experimental-webstorage
+
+      - name: Lint
+        run: |
+          npm run lint
+
+      - name: Test
+        run: |
+          npm test
+
+      - name: Build Windows installer
+        run: |
+          npm run package-win
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: setup/win/Output/*.exe
+
+  build-ubuntu:
+    name: "Build Ubuntu Package"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        node-version: [24.x]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build frontend
+        run: |
+          cd _admin
+          npm install
+          
+      - name: Build
+        run: |
+          npm install
+          npm run build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider --no-experimental-webstorage
+
+      - name: Lint
+        run: |
+          npm run lint
+
+      - name: Test
+        run: |
+          npm test
+
+      - name: Build Ubuntu package
+        run: |
+          npm run package-deb
+
+      - name: Upload Ubuntu artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ubuntu-package
+          path: setup/deb/output/*.deb
+
+  release:
+    name: "Create Release"
+    needs: [build-windows, build-ubuntu]
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+          path: ./windows/
+
+      - name: Download Ubuntu artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ubuntu-package
+          path: ./ubuntu/
+
+      - name: Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            ./windows/*.exe
+            ./ubuntu/*.deb
