@@ -1,0 +1,7 @@
+{
+  "PORT": 4300,
+  "CACHEAROO_STORAGE_KIND": "leveldb", 
+  "CACHEAROO_LOG_PATH":  "/var/log/cachearoo/",
+  "CACHEAROO_LOG_LEVEL":  "info",
+  "CACHEAROO_BUCKET_DIR": "/var/lib/cachearoo/buckets/"
+}

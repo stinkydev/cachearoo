@@ -1,0 +1,4 @@
+# Ignore built packages and temporary files
+output/*.deb
+opt/cachearoo/*
+!opt/cachearoo/.gitkeep

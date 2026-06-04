@@ -1,0 +1,14 @@
+<html>
+<body>
+  <script src="/js/de.js"></script>
+  <script src="/js/de.msg.request-reply.js"></script>
+  
+  <script>
+     var de = new Cachearoo();
+     var replier = new Replier(de, 'testing');
+     replier.onMessage = function(msg, reply) {
+       reply(null, {text: 'kanon'});
+     }
+  </script>
+</body>
+</html>

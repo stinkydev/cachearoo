@@ -1,0 +1,53 @@
+<html>
+<body>
+  <script src="/js/de.js"></script>
+  <script src="/js/de.msg.competing-consumers.js"></script>
+  
+  <script>
+     var de = new Cachearoo();
+    
+     var consumer = new CompetingConsumer(de, 'testing', 10);
+     var MyWorker = function(id) {
+         var self = this;
+         this.id = id;
+         this.available = true;
+
+         this.release = function() {
+             this.available = true;
+         }
+
+         this.work = function(job, callback) {
+             (function(callback) {
+                 setTimeout(function() {
+                     console.log('worker working..', self.id);
+                     callback(null, {});
+                     self.available = true;
+                 }, 120);
+             })(callback);
+         }
+     }
+
+     var workers = [];
+     for (var i = 0; i < 3; i++) {
+         workers.push(new MyWorker(i));
+     }
+
+     var cnt = 0;
+     consumer.onJobQuery = function(job, callback) {
+         cnt++;
+         if (cnt == 11) {
+             callback(consumer.ERROR_JOB_NOT_SUPPORTED);
+             return;
+         }
+         for (var i = 0; i < workers.length; i++) {
+             if (workers[i].available) {
+                 workers[i].available = false;
+                 callback(null, workers[i]);
+                 return;
+             }
+         }
+         callback(consumer.ERROR_NO_WORKER_AVAILABLE);
+     }
+  </script>
+</body>
+</html>

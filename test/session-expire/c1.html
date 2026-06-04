@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>C1</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <div id="timer">t</div>
+  
+  <script src="/js/de.js"></script>
+  <script>
+	 var BUCKET = 'JELLO';
+     var de = new Cachearoo({bucket: BUCKET});
+      // write expiring key before ws is connected, should fail
+    de.write('expiring-key', {hoho: "haha"}, {expire: 'session'})
+    .then(function() {
+        console.log('succeeded but shouldnt')
+    })
+    .catch(function(err) {
+        console.log('failed write, which is good', err);
+    })
+
+      de.connection.onConnect = function() {
+        console.log('CONNECT', de.connection.id);
+        for (var i = 0; i < 50; i++) {
+          (function(i) {
+            de.write('expiring-key-' + i, {hoho: "haha"}, {expire: 'session'})
+            .then(function() {
+              console.log('written')
+            })
+            .catch(function(err) {
+              console.log('failed write', err);
+            })
+          })(i);
+        }
+      };
+	
+  </script>
+</body>
+
+</html>

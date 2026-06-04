@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "./build/app",   // Our compiled files will be placed here
+    "target": "es2017",
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

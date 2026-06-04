@@ -1,0 +1,22 @@
+<html>
+<body>
+  <script src="/js/de.js"></script>
+  <script src="/js/de.msg.request-reply.js"></script>
+  
+  <script>
+     var de = new Cachearoo();
+
+     de.connection.onConnect = function() {
+       var requestor = new Requestor(de, 'testing2', 1000);
+       
+       requestor.request({ost: "kex"})
+       .then(function(response) {
+         console.log('response!', response);
+       })
+       .catch(function(err) {
+         console.log('error : ' + err);
+       });
+     };
+  </script>
+</body>
+</html>

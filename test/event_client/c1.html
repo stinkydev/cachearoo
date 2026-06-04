@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>C1</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <div id="timer">t</div>
+  
+  <script src="../../js/de-0.1.js"></script>
+  <script>
+     var log = function (msg) {
+	   var node = document.createElement("P");
+       var t = document.createTextNode(msg);
+       node.appendChild(t);
+       document.body.appendChild(node);
+	 }
+     
+	 var update = function(data) {
+	   document.getElementById("timer").innerHTML = data; 
+	 }
+	 
+	 var BUCKET = 'JELLO';
+     var de = new Cachearoo({
+       bucket: BUCKET,
+       host: '192.168.5.189',
+       port: 4300
+     });
+	
+	var eventCallback = function(data) {
+	  update(JSON.stringify(data));
+	}
+	
+	de.events.addListener(BUCKET, '*', true, eventCallback);
+	
+	log('started...');
+	update('init');
+  </script>
+</body>
+
+</html>

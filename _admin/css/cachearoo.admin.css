@@ -1,0 +1,381 @@
+:root {
+  --admin-bg: #f5f7fa;
+  --admin-border: #d8dee7;
+  --admin-text: #172033;
+  --admin-muted: #667085;
+  --admin-surface: #ffffff;
+  --admin-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --admin-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+body {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  font-family: var(--admin-font);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+button,
+input,
+select,
+textarea,
+.modal,
+.navbar,
+.table {
+  font-family: var(--admin-font);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #475467;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-shell-centered {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.app-content {
+  margin: 0 auto;
+  max-width: 1280px;
+  padding: 1.25rem;
+}
+
+.top-menu {
+  border-bottom: 1px solid var(--admin-border);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  padding: .65rem 1.25rem;
+}
+
+.top-menu .navbar-brand {
+  color: var(--admin-text);
+  font-size: .95rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.top-menu .nav-link {
+  border-radius: 6px;
+  color: var(--admin-muted);
+  font-size: .82rem;
+  margin-left: .25rem;
+  padding: .4rem .65rem;
+}
+
+.top-menu .nav-link.active {
+  background: #e7eef8;
+  color: #164b83;
+}
+
+.tableMargin {
+  position: relative;
+}
+
+.page-header {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: .75rem;
+}
+
+.page-header h1 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.page-header p {
+  color: var(--admin-muted);
+  font-size: .78rem;
+  margin: .25rem 0 0;
+}
+
+.action-row,
+.pagination-row,
+.table-toolbar {
+  align-items: center;
+  display: flex;
+  gap: .5rem;
+}
+
+.table-toolbar {
+  margin-bottom: .75rem;
+}
+
+.table-toolbar .form-control {
+  max-width: 360px;
+}
+
+.table-toolbar .form-select {
+  max-width: 130px;
+}
+
+.tableBorder {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table {
+  margin-bottom: 0;
+}
+
+.admin-table th {
+  background: #f8fafc;
+  border-bottom-color: var(--admin-border);
+  color: #475467;
+  font-size: .72rem;
+  font-weight: 650;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.admin-table td {
+  color: #27364b;
+  font-size: .8rem;
+  line-height: 1.25;
+  padding-bottom: .42rem;
+  padding-top: .42rem;
+  vertical-align: middle;
+}
+
+.admin-table a {
+  color: #164b83;
+  font-size: .8rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.admin-table a:hover,
+.admin-table a:focus {
+  color: #0f355e;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.admin-table tbody tr {
+  cursor: default;
+}
+
+.key-cell {
+  font-family: var(--admin-font);
+  font-size: .8rem;
+  max-width: 560px;
+  overflow-wrap: anywhere;
+}
+
+.check-cell {
+  text-align: center;
+  width: 42px;
+}
+
+.table-sort {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 650;
+  padding: 0;
+  text-align: left;
+  text-transform: inherit;
+}
+
+.table-sort::after {
+  content: "";
+  display: none;
+  border: solid #98a2b3;
+  border-width: 0 1.5px 1.5px 0;
+  height: 6px;
+  margin-left: .3rem;
+  position: relative;
+  top: -1px;
+  width: 6px;
+}
+
+.table-sort.asc::after,
+.table-sort.desc::after {
+  display: inline-block;
+}
+
+.table-sort.asc::after {
+  transform: rotate(-135deg);
+}
+
+.table-sort.desc::after {
+  top: -4px;
+  transform: rotate(45deg);
+}
+
+.table-toolbar .form-control,
+.table-toolbar .form-select,
+.btn-sm,
+.smaller-btn {
+  font-size: .8rem;
+}
+
+.pagination-row {
+  color: var(--admin-muted);
+  font-size: .8rem;
+  justify-content: flex-end;
+  margin-top: .75rem;
+}
+
+.empty-state {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state h1,
+.empty-state h2 {
+  font-size: 1rem;
+  font-weight: 650;
+  margin: 0 0 .4rem;
+}
+
+.empty-state p {
+  color: var(--admin-muted);
+  margin: 0;
+}
+
+.table-empty {
+  border: 0;
+  border-radius: 0;
+}
+
+.smaller-btn {
+  line-height: 1.1;
+}
+
+#editor {
+  width: 100%;
+  height: 60vh;
+  z-index: 100;
+}
+
+#editor-container {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+
+#key-editor .modal-title {
+  width: 100%;
+  cursor: move;
+  font-size: .98rem;
+  font-weight: 650;
+}
+
+#key-editor .modal-content {
+  /* this is because we can resize this background so we'll hide it. The coloring will
+  now be maintained by the modal-resizable class */
+  background: transparent;
+}
+
+#key-editor .modal-content > .modal-resizable {
+  background-color: white;
+  background-clip: padding-box;
+  border: 1px solid #ebedee;
+  border: 0;
+  border-radius: .2em;
+  box-shadow: 0 0 0 1px rgba(101, 108, 126, 0.5) inset, 0 1px 3px 1px rgba(64, 64, 64, 0.5);
+}
+
+#key-editor .modal-resizable > .modal-body {
+  /* This is to account for the height of the footer */
+  padding: 1em 1em 5em 1em;
+}
+
+.modal-title {
+  font-size: .98rem;
+  font-weight: 650;
+}
+
+.modal-body,
+.modal-footer,
+.form-label,
+.form-control,
+.form-select,
+.form-check-label {
+  font-size: .84rem;
+}
+
+.form-label {
+  color: #344054;
+  font-weight: 550;
+  margin-bottom: .35rem;
+}
+
+.jsoneditor,
+.jsoneditor-menu,
+.jsoneditor-navigation-bar,
+.jsoneditor-statusbar,
+.jsoneditor-tree,
+.jsoneditor textarea,
+.jsoneditor input {
+  font-family: var(--admin-font) !important;
+  font-size: .82rem !important;
+}
+
+.ace_editor,
+.ace_editor *,
+.jsoneditor-text,
+.jsoneditor-field,
+.jsoneditor-value {
+  font-family: var(--admin-mono) !important;
+}
+
+.ace_editor {
+  font-size: .82rem !important;
+  line-height: 1.45 !important;
+}
+
+@media (max-width: 640px) {
+  .app-content {
+    padding: .8rem;
+  }
+
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .action-row,
+  .table-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .table-toolbar .form-control,
+  .table-toolbar .form-select {
+    max-width: none;
+  }
+}
+
+#key-editor .modal-footer {
+  /* this is to keep the footer pinned to the bottom when we resize */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}

@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+# Create cachearoo user if it doesn't exist
+if ! getent passwd cachearoo > /dev/null; then
+    useradd --system --no-create-home --shell /usr/sbin/nologin cachearoo
+fi
+
+# Create data and log directories
+mkdir -p /var/lib/cachearoo/buckets
+mkdir -p /var/log/cachearoo
+
+# Set ownership
+chown -R cachearoo:cachearoo /opt/cachearoo
+chown -R cachearoo:cachearoo /var/lib/cachearoo
+chown -R cachearoo:cachearoo /var/log/cachearoo
+
+# Reload systemd and enable the service
+systemctl daemon-reload
+systemctl enable cachearoo.service
+
+echo "Cachearoo has been installed successfully."
+echo "You can start the service with: sudo systemctl start cachearoo"
+echo "The service will be accessible on http://localhost:4300"

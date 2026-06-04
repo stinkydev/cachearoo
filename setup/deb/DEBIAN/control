@@ -1,0 +1,14 @@
+Package: cachearoo
+Version: 1.0.9
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: systemd
+Maintainer: Stinky Computing <info@stinky.tv>
+Description: Cachearoo - High-performance caching server
+ Cachearoo is a high-performance, configurable caching server
+ that provides fast data storage and retrieval capabilities.
+ This package includes an embedded Node.js runtime and runs
+ as a systemd service on port 4300.
+ .
+ Licensed under the MIT License. See /opt/cachearoo/LICENSE.

@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+# Remove the cachearoo user if it exists
+if getent passwd cachearoo > /dev/null; then
+    userdel cachearoo || true
+fi
+
+# Clean up any remaining files
+rm -rf /opt/cachearoo
+rm -rf /var/lib/cachearoo
+rm -rf /var/log/cachearoo
+
+echo "Cachearoo has been completely removed."

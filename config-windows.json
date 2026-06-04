@@ -1,0 +1,6 @@
+{
+  "PORT": 4300,"CACHEAROO_STORAGE_KIND": "leveldb", 
+  "CACHEAROO_LOG_PATH":  "c:/log/cachearoo/", 
+  "CACHEAROO_LOG_LEVEL": "info",
+  "CACHEAROO_BUCKET_DIR": "c:/cachearoo/buckets/"
+}

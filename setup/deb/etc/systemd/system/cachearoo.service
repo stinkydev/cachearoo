@@ -1,0 +1,33 @@
+[Unit]
+Description=Cachearoo - High-performance caching server
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=cachearoo
+Group=cachearoo
+WorkingDirectory=/opt/cachearoo
+ExecStart=/opt/cachearoo/node /opt/cachearoo/app/app.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=cachearoo
+Environment=NODE_ENV=production
+Environment=PORT=4300
+
+# Security measures
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/cachearoo /var/lib/cachearoo /var/log/cachearoo
+PrivateTmp=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
