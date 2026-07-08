@@ -46,12 +46,22 @@ export default class KeyEditor extends React.PureComponent {
       this.focusEditor();
     }
 
+    if (prevState.showing && !showing) {
+      // the modal unmounts its DOM on close, so the editor must be destroyed
+      // and recreated on the next open
+      this.destroyEditor();
+    }
+
     if (prevState.height !== height) {
       this.resizeEditor();
     }
   }
 
   componentWillUnmount() {
+    this.destroyEditor();
+  }
+
+  destroyEditor = () => {
     if (this.editor) {
       this.editor.destroy();
       this.editor = null;
