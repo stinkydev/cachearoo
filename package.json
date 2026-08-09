@@ -22,7 +22,7 @@
     "test": "ts-mocha test/**/*.test.ts"
   },
   "description": "Cachearoo - production-grade key/value store with a WebSocket event bus",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "license": "MIT",
   "author": "Stinky Computing AB",
   "homepage": "https://github.com/stinkydev/cachearoo#readme",

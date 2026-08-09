@@ -40,7 +40,9 @@ export class Config {
     this.AZURE_STORAGE_CONNECTION_STRING = nconf.get('AZURE_STORAGE_CONNECTION_STRING');
     this.apiKey = nconf.get('CACHEAROO_API_KEY');
     this.publicRead = !!nconf.get('CACHEAROO_PUBLIC_READ');
-    this.bucketDir = nconf.get('CACHEAROO_BUCKET_DIR') || `${defaultBucketPath}/`;
+    // bucket paths are built by concatenation, so bucketDir must end with a separator
+    const bucketDir: string = nconf.get('CACHEAROO_BUCKET_DIR') || defaultBucketPath;
+    this.bucketDir = (bucketDir.endsWith('/') || bucketDir.endsWith('\\')) ? bucketDir : `${bucketDir}/`;
     this.logPath = nconf.get('CACHEAROO_LOG_PATH') || defaultLogPath;
     this.logLevel = nconf.get('CACHEAROO_LOG_LEVEL') || 'info';
     this.indexRedirect = nconf.get('CACHEAROO_INDEX_REDIRECT') || '/_admin';
