@@ -8,6 +8,7 @@ const clients = new Map<string, ReplicationClient>();
 
 class ReplicationClient {
   public uri: string;
+  private safeUri: string;
   private socket: WebSocketClient;
   private ds: DataStore;
 
@@ -25,6 +26,7 @@ class ReplicationClient {
 
   constructor(uri: string, bucket: IBucket, callback) {
     this.uri = uri;
+    this.safeUri = redactUri(uri);
 
     this.socket = new WebSocketClient({
       maxReceivedMessageSize: 128 * 1024 * 1024,
@@ -62,10 +64,10 @@ class ReplicationClient {
     });
 
     this.socket.on('connect', (connection) => {
-      logger.info(`Replication connected for ${this.bucket.key} to ${this.uri}`);
+      logger.info(`Replication connected for ${this.bucket.key} to ${this.safeUri}`);
       this.bucket.status.replicationConnected = true;
-      this.bucket.status.replicationStatus = `connected to ${this.uri}`;
-      this._status = `connected to ${this.uri}`;
+      this.bucket.status.replicationStatus = `connected to ${this.safeUri}`;
+      this._status = `connected to ${this.safeUri}`;
       this._connected = true;
       this.connection = connection;
       connection.sendUTF(JSON.stringify({
@@ -80,7 +82,7 @@ class ReplicationClient {
 
       connection.on('close', () => {
         this.bucket.status.replicationConnected = false;
-        this.bucket.status.replicationStatus = `disconnected - ${this.uri}`;
+        this.bucket.status.replicationStatus = `disconnected - ${this.safeUri}`;
         logger.warn('ws client closed');
         this._connected = false;
         this._status = 'closed';
@@ -110,7 +112,7 @@ class ReplicationClient {
   // failure (log + schedule reconnect) so one bad bucket URI can't crash the server.
   private tryConnect() {
     try {
-      this.socket.connect(this.uri);
+      this.socket.connect(this.uri, null, null, this.handshakeHeaders());
     } catch (err) {
       const message = (err instanceof Error) ? err.message : String(err);
       logger.error(`Replication connect error for ${this.bucket.key}: ${message}`);
@@ -120,6 +122,15 @@ class ReplicationClient {
       this._status = message;
       this.reconnect();
     }
+  }
+
+  // Send the bucket's API key on the WebSocket upgrade request so proxies or
+  // auth layers in front of the master can check it. The master itself still
+  // validates the key from the register-replication-client message.
+  private handshakeHeaders(): Record<string, string> | null {
+    const apiKey = this.bucket.config.apiKey;
+    if (!apiKey) return null;
+    return { 'API-Key': apiKey, 'x-api-key': apiKey };
   }
 
   private reconnect() {
@@ -140,13 +151,38 @@ export function initReplicationClients(buckets, datastore: DataStore) {
         if (buckets[i].config.replicationURI === client.uri) continue;
         killWebSocket(buckets[i].key);
       }
-      setupWebSocket(`${buckets[i].config.replicationURI}?id=${getDeviceId()}`, buckets[i], (replObj) => {
+      setupWebSocket(buildReplicationUri(buckets[i]), buckets[i], (replObj) => {
         datastore.receiveReplicationMessage(replObj);
       });
     } else {
       killWebSocket(buckets[i].key);
     }
   }
+}
+
+// Master connection URI: device id always; api-key only when the bucket is
+// secured with an API key AND the connection is TLS (wss://). Query strings
+// end up in proxy/access logs, so never put the key in one over plain ws://.
+function buildReplicationUri(bucket: IBucket): string {
+  const base: string = bucket.config.replicationURI;
+  let uri = `${base}?id=${getDeviceId()}`;
+  if (bucket.config.apiKey) {
+    if (isTlsUri(base)) {
+      uri += `&api-key=${encodeURIComponent(bucket.config.apiKey)}`;
+    } else {
+      logger.warn(`Replication for ${bucket.key}: not sending api-key query param over non-TLS URI`);
+    }
+  }
+  return uri;
+}
+
+function isTlsUri(uri: string): boolean {
+  return /^wss:\/\//i.test(uri.trim());
+}
+
+// URI safe for logs and status output (api-key value masked).
+function redactUri(uri: string): string {
+  return uri.replace(/([?&]api-key=)[^&]*/, '$1***');
 }
 
 function disconnectIfOpen(key: string) {
