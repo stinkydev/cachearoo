@@ -6,7 +6,8 @@ if ! getent passwd cachearoo > /dev/null; then
     useradd --system --no-create-home --shell /usr/sbin/nologin cachearoo
 fi
 
-# Create data and log directories
+# Create application, data, and log directories
+mkdir -p /opt/cachearoo
 mkdir -p /var/lib/cachearoo/buckets
 mkdir -p /var/log/cachearoo
 
