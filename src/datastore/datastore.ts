@@ -8,6 +8,7 @@ import { IDataStore, IBucket } from './idatastore';
 import { EventEmitter } from 'events';
 import { Config } from '../config';
 import { logger } from '../logger';
+import { ALREADY_EXISTS, NOT_FOUND, StoreError } from '../store-error';
 
 const BUCKET_CONFIG_NAME = '_bucket_config';
 const VIRTUAL_PATHS_CONFIG_NAME = '_virtual_paths_config';
@@ -222,7 +223,7 @@ export class DataStore extends EventEmitter{
         value: this.buckets.get(id),
       };
     }
-    throw new Error(`Bucket does not exist: ${id}`);
+    throw new StoreError(NOT_FOUND, `Bucket does not exist: ${id}`);
   }
 
   private async deleteExpiredKeys(bucket: IBucket) {
@@ -273,7 +274,7 @@ export class DataStore extends EventEmitter{
       await this.updateBuckets();
       bucket = this.buckets.get(bucketName);
     }
-    if (!bucket) throw new Error(`Bucket ${bucketName} not found`);
+    if (!bucket) throw new StoreError(NOT_FOUND, `Bucket ${bucketName} not found`);
     return await storage.read(bucket, key);
   }
 
@@ -312,13 +313,14 @@ export class DataStore extends EventEmitter{
     } finally {
       release();
     }
-    if (exists) throw new Error('EEXISTS');
+    if (exists) throw new StoreError(ALREADY_EXISTS, `Key ${key} already exists`);
   }
 
   public async patch(bucketName: string, key: string, patch: any,
     userdata: any, requestId: string, removeDataFromReply: boolean) {
 
     const bucket = this.buckets.get(bucketName);
+    if (!bucket) throw new StoreError(NOT_FOUND, `Bucket ${bucketName} not found`);
     const storage = this.getStorage(bucket);
 
     const release = await writeSemaphore.acquire();

@@ -1,13 +1,14 @@
 import { Router, Request, Response } from 'express';
 import { DataStore } from '../../datastore/datastore';
 import { logger } from '../../logger';
+import { StoreError, errorCode, wireError } from '../../store-error';
 
 const router = Router();
-const DEFAULT_ERROR_CODE = 500;
 
-function handleError(res: Response, err: Error, code?: number) {
+function handleError(res: Response, err: Error) {
+  const error = wireError(err);
   logger.error(`REST api error ${err}`);
-  res.status(code || DEFAULT_ERROR_CODE).json({ error: err.message });
+  res.status(error.code).json({ error: error.message, code: error.code });
 }
 
 export class DataStoreRouter {
@@ -38,7 +39,7 @@ export class DataStoreRouter {
           const arr = await ds.list(getBucket(req), req.query.filter as string, isTrue(req.query.keysOnly));
           res.json(arr);
         } catch (err) {
-          handleError(res, err, 404);
+          handleError(res, err);
         }
       })
       .post((req, res, next) => {
@@ -49,7 +50,7 @@ export class DataStoreRouter {
           await ds.removeBucketAndData(getBucket(req));
           res.send('ok');
         } catch (err) {
-          handleError(res, new Error(`Could not delete bucket data in bucket: ${getBucket(req)} ${err.message}`));
+          handleError(res, new StoreError(errorCode(err), `Could not delete bucket data in bucket: ${getBucket(req)} ${err.message}`));
         }
       });
 
@@ -60,7 +61,7 @@ export class DataStoreRouter {
           res.header('X-Write-Timestamp', obj.timestamp);
           res.json(obj.value);
         } catch (err) {
-          handleError(res, err, 404);
+          handleError(res, err);
         }
       }).post(async (req, res, next) => {
         await doPost(req, res, false);
@@ -85,7 +86,7 @@ export class DataStoreRouter {
           await ds.remove(getBucket(req), getKey(req));
           res.send('ok');
         } catch (err) {
-          handleError(res, new Error(`Could not delete bucket=${getBucket(req)}, key=${getKey(req)}`));
+          handleError(res, new StoreError(errorCode(err), `Could not delete bucket=${getBucket(req)}, key=${getKey(req)}`));
         }
       });
 
@@ -115,11 +116,7 @@ export class DataStoreRouter {
           res.send();
         }
       } catch (err) {
-        if (err.name === 'EEXISTS') {
-          handleError(res, err, 412);
-        } else {
-          handleError(res, err, 500);
-        }
+        handleError(res, err);
       }
     }
     return router;

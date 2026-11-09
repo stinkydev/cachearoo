@@ -1,12 +1,13 @@
 import { DataStore } from '../../datastore/datastore';
 import { logger } from '../../logger';
+import { BAD_REQUEST, IWireError, NOT_FOUND, StoreError, errorCode, wireError } from '../../store-error';
 
 const BUCKET_SEPARATOR = '|-//--//--//-|';
 
 export interface IResponseObject {
   id: string;
   value?: any;
-  error?: any;
+  error?: IWireError;
   location?: string;
 }
 
@@ -73,65 +74,45 @@ export class WSAPIDataStoreOperations {
     if (req.bucket) req.bucket = `${req.bucket}`;
     req.connection = connection;
 
-    switch (req.op) {
-      case 'read':
-        connection.info.reads = connection.info.reads + 1;
-        try {
-          const value = await this.processRead(req);
-          response.value = value;
-        } catch (err) {
-          response.error = err;
-        }
-        connection.send(JSON.stringify({ response }));
-        break;
-      case 'filter':
-        try {
-          const value = await this.processFilter(req);
-          response.value = value;
-        } catch (err) {
-          response.error = err;
-        }
-        connection.send(JSON.stringify({ response }));
-        break;
-      case 'write':
-        connection.info.writes = connection.info.writes + 1;
-        try {
+    let failure = null;
+    try {
+      switch (req.op) {
+        case 'read':
+          connection.info.reads = connection.info.reads + 1;
+          response.value = await this.processRead(req);
+          break;
+        case 'filter':
+          response.value = await this.processFilter(req);
+          break;
+        case 'write': {
+          connection.info.writes = connection.info.writes + 1;
           const key = await this.processWrite(req);
           if (req.expire === 'session') {
             this.expiringkeys.add(req.bucket, key, req.connection);
           }
           response.location = `/_data/${req.bucket}/${key}`;
-        } catch (err) {
-          response.error = err;
+          break;
         }
-        connection.send(JSON.stringify({ response }));
-        break;
-      case 'remove':
-        connection.info.writes = connection.info.writes + 1;
-        try {
+        case 'remove':
+          connection.info.writes = connection.info.writes + 1;
           await this.processRemove(req);
-        } catch (err) {
-          response.error = err;
-        }
-        connection.send(JSON.stringify({ response }));
-        break;
-      case 'patch':
-        connection.info.writes = connection.info.writes + 1;
-        try {
-          const value = await this.processPatch(req);
-          response.value = value;
-        } catch (err) {
-          response.error = err;
-        }
-        connection.send(JSON.stringify({ response }));
-        break;
-      default:
-        response.error = new Error('Operation not found!');
-        break;
+          break;
+        case 'patch':
+          connection.info.writes = connection.info.writes + 1;
+          response.value = await this.processPatch(req);
+          break;
+        default:
+          throw new StoreError(BAD_REQUEST, `Unknown operation: ${req.op}`);
+      }
+    } catch (err) {
+      failure = err;
+      response.error = wireError(err);
     }
+    connection.send(JSON.stringify({ response }));
 
-    if (response.error) {
-      throw response.error;
+    // a missing key is an answer, not a failure of the store
+    if (failure && errorCode(failure) !== NOT_FOUND) {
+      throw failure;
     }
   }
 

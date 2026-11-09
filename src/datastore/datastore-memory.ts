@@ -1,3 +1,4 @@
+import { NOT_FOUND, StoreError } from '../store-error';
 import { IDataStore, IDataStoreObject, IDataStoreObjectMetaData, IBucketParameters, IBucket } from './idatastore';
 
 export class DataStoreInMemory implements IDataStore {
@@ -9,14 +10,14 @@ export class DataStoreInMemory implements IDataStore {
 
   private getBucket(key: string): Map<string, any> {
     const bkt = this.store.get(key);
-    if (!bkt) throw new Error(`Bucket ${key} not found`);
+    if (!bkt) throw new StoreError(NOT_FOUND, `Bucket ${key} not found`);
     return bkt;
   }
 
   public async read(bucket: IBucket, key: string): Promise<IDataStoreObject> {
     const bkt = this.getBucket(bucket.key);
     const val = bkt.get(key);
-    if (!val) throw new Error(`'Key ${key} not found in ${bucket.key}`);
+    if (!val) throw new StoreError(NOT_FOUND, `Key ${key} not found in ${bucket.key}`);
     return { value: val.content, timestamp: val.timestamp };
   }
 

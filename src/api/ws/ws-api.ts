@@ -7,6 +7,7 @@ import * as URL from 'url';
 import { DataStore } from '../../datastore/datastore';
 import { Server } from 'http';
 import { logger } from '../../logger';
+import { FORBIDDEN } from '../../store-error';
 
 const MAX_OBJ_SIZE = 1024 * 1024 * 128;
 
@@ -175,7 +176,7 @@ export class WSAPI {
               if ((this.apiKey) && ((this.apiKey !== obj.apiKey))) {
                 const isRead = this.dsOperations.isReadOperation(obj);
                 if ((!isRead) || (isRead && !this.publicReadOk)) {
-                  return connection.send(JSON.stringify({ response: { id: obj.request.id, error: 'Not authorized' } }));
+                  return connection.send(JSON.stringify({ response: { id: obj.request.id, error: { code: FORBIDDEN, message: 'Not authorized' } } }));
                 }
               }
 
